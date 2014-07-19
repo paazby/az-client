@@ -18,12 +18,13 @@ app.run(function($ionicPlatform, $rootScope, Database, Events, $window, $state) 
     }
   });
 
-  // $rootScope.$on('$stateChangeStart', function(event, toState) {
-  //   if (toState.name !== "signin" && !$window.sessionStorage['fbtoken']) {
-  //     $state.go('signin');
-  //     event.preventDefault();
-  //   }
-  // });
+  $rootScope.$on('$stateChangeStart', function(event, toState) {
+    if (toState.name !== "signin" && !$window.sessionStorage['fbtoken']) {
+      $state.go('signin');
+      event.preventDefault();
+    }
+    console.log('**stateChangeStart**');
+  });
 
 
   Database.potentialMatches().success(function(data) {
@@ -35,7 +36,7 @@ app.run(function($ionicPlatform, $rootScope, Database, Events, $window, $state) 
   $rootScope.currentEvent = {};
   Events.getEvents().then(function(results) {
     $rootScope.potentialEvents = results.data.events;
-    console.log($rootScope.potentialEvents)
+    //console.log($rootScope.potentialEvents)
   });
 
   Database.matches($rootScope.currentUser.id).success(function(data) {

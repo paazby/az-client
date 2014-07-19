@@ -3,15 +3,18 @@ angular.module('openfb', [])
   .factory('OpenFB', function ($rootScope, $q, $window, $http) {
 
         var FB_LOGIN_URL = 'http://zavadil7.cloudapp.net/auth/facebook';
-        // By default we store fbtoken in sessionStorage. This can be overriden in init()
-        var tokenStore = window.sessionStorage;
+        // By default we store fbtoken in sessionStorage. This can be overriden
+        // in init()
+        var tokenStore = window.localStorage;
         var oauthRedirectURL = 'http://zavadil7.cloudapp.net/linden/passman/dustytoken';
-        // Because the OAuth login spans multiple processes, we need to keep the success/error handlers as variables
+        // Because the OAuth login spans multiple processes, we need to keep the
+        // success/error handlers as variables
         // inside the module instead of keeping them local within the login function.
         var deferredLogin;
         // Indicates if the app is running inside Cordova
         var runningInCordova;
-        // Used in the exit event handler to identify if the login has already been processed elsewhere (in the oauthCallback function)
+        // Used in the exit event handler to identify if the login has already been
+        // processed elsewhere (in the oauthCallback function)
         var loginProcessed;
 
         document.addEventListener("deviceready", function () {
@@ -19,8 +22,9 @@ angular.module('openfb', [])
         }, false);
 
         /**
-         * Initialize the OpenFB module. You must use this function and initialize the module with an appId before you can
-         * use any other function.
+         * Initialize the OpenFB module. You must use this function and initialize the 
+         * module with an appId before you can use any other function. (not relevant in
+         * our case as the appId is delivered by the server
          * @param appId - The id of the Facebook app
          * @param redirectURL - The OAuth redirect URL. Optional. If not provided, we use sensible defaults.
          * @param store - The store used to save the Facebook token. Optional. If not provided, we use sessionStorage.

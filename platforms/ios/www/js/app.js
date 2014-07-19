@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 var app = angular.module('icebreaker', ['ionic', 'openfb']);
 
-app.run(function($ionicPlatform, $rootScope, $window, Database) {
+app.run(function($ionicPlatform, $rootScope, Database, Events, $window, $state) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -23,7 +23,9 @@ app.run(function($ionicPlatform, $rootScope, $window, Database) {
       $state.go('signin');
       event.preventDefault();
     }
+    console.log('**stateChangeStart**');
   });
+
 
   Database.potentialMatches().success(function(data) {
     $rootScope.potentialMatches = data.results;
@@ -32,9 +34,9 @@ app.run(function($ionicPlatform, $rootScope, $window, Database) {
   $rootScope.currentUser = {};
   $rootScope.currentUser.id = 0;
   $rootScope.currentEvent = {};
-  Database.potentialEvents().success(function(data) {
-    $rootScope.potentialEvents = data.results;
-    console.log(data);
+  Events.getEvents().then(function(results) {
+    $rootScope.potentialEvents = results.data.events;
+    //console.log($rootScope.potentialEvents)
   });
 
   Database.matches($rootScope.currentUser.id).success(function(data) {
@@ -56,32 +58,6 @@ app.run(function($ionicPlatform, $rootScope, $window, Database) {
       templateUrl: 'templates/sign-in.html',
       controller: 'SignInCtrl'
     })
-
-    // .state('tab', {
-    //   url: '/tab',
-    //   abstract: true,
-    //   templateUrl: "../templates/tabs.html"
-    // })
-
-    // .state('tab.events', {
-    //   url: '/events',
-    //   views: {
-    //     'tab-events': {
-    //       templateUrl: '../templates/events.html',
-    //       controller: 'EventsCtrl'
-    //     }
-    //   }
-    // })
-    
-    // .state('tab.matches', {
-    //   url: '/matches',
-    //   views: {
-    //     'tab-matches': {
-    //       templateUrl: '../templates/matches.html',
-    //       controller: 'MatchesCtrl'
-    //     }
-    //   }
-    // })
 
     .state('events', {
       url: '/events',
@@ -117,8 +93,5 @@ app.run(function($ionicPlatform, $rootScope, $window, Database) {
       url: '/specificEvent',
       templateUrl: 'templates/specificEvent.html',
       controller: 'SpecificEventCtrl'
-    })
-
-
-})
-
+    });
+  });
