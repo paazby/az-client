@@ -53,10 +53,6 @@ angular.module('openfb', [])
           // todo: put location=no back in
           loginWindow = window.open(FB_LOGIN_URL , '_blank');
            
-                                       
-                                       
-          
-
           // If the app is running in Cordova, listen to URL changes in the InAppBrowser until we get a URL with an access_token or an error
           if (runningInCordova) {
            
@@ -66,39 +62,28 @@ angular.module('openfb', [])
               url = url.split('?');
               console.log('url: ', url);
               if( url[0] === oauthRedirectURL){
+                oauthCallback(url[1]);
                 console.log('Bingo!!!!!');
               }
             });
 
            
-            loginWindow.addEventListener('loadstart', function (event) {
-              var url = event.url;
-              if (url.indexOf("access_token=") > 0 || url.indexOf("error=") > 0) {
-                loginWindow.close();
-                oauthCallback(url);
-              }
-            });
-
             loginWindow.addEventListener('loadstop', function(event){
                 var url = event.url;
                 console.log('this is token: ', url);
             });
+           
             loginWindow.addEventListener('exit', function () {
               // Handle the situation where the user closes the login window manually before completing the login process
               deferredLogin.reject({error: 'user_cancelled', error_description: 'User cancelled login process', error_reason: "user_cancelled"});
             });
           } else {
-             loginWindow.addEventListener('loadstart', function (event) {
-              var url = event.url;
-
-              if (url.indexOf("access_token=") > 0 || url.indexOf("error=") > 0) {
-                loginWindow.close();
-                oauthCallback(url);
-              }
-            });
+            // TODO: logic to make the logic work where we're running in the browswer
+            // instead of an emulator
           }
-          // Note: if the app is running in the browser the loginWindow dialog will call back by invoking the
-          // oauthCallback() function. See oauthcallback.html for details.
+          // Note: if the app is running in the browser the loginWindow dialog
+          // will call back by invoking the oauthCallback() function. See
+          // oauthcallback.html for details.
 
           return deferredLogin.promise;
 
@@ -111,16 +96,17 @@ angular.module('openfb', [])
          * OAuth workflow. */
          
         function oauthCallback(url) {
+            console.log('oauthCallback triggered:',  url)
             // Parse the OAuth data received from Facebook
-            var queryString;
+            var serverGeneratedJWT;
             var obj;
-            console.log('inside of oAuth, heres the url: ',  url)
+           
             loginProcessed = true;
-            if (url.indexOf("token=") > 0) {
-                queryString = url.substr(url.indexOf('#') + 1);
-                obj = parseQueryString(queryString);
-                console.log('setting access token, heres the object ' + obj);
-                tokenStore['fbtoken'] = obj['access_token'];
+            if (url.indexOf("token=") !== -1) {
+                serverGeneratedJWT = url.substring(url.indexOf('=') + 1);
+                console.log('setting token, heres the object ' + serverGeneratedJWT);
+                tokenStore.setItem('jwtToken',serverGeneratedJWT);
+                console.log('tokenStore.getItem', tokenStore.getItem('jwtToken'));
                 deferredLogin.resolve();
             } else if (url.indexOf("error=") > 0) {
                 console.log('there was an error');
@@ -135,8 +121,9 @@ angular.module('openfb', [])
          * Application-level logout: we simply discard the token.
          */
         function logout() {
-          console.log('logout!!!!');
-          tokenStore.setItem('fbtoken',undefined);
+          console.log('logout before', tokenStore, tokenStore.getItem('jwtToken'));
+          tokenStore.setItem('jwtToken','');
+          console.log('logout after', tokenStore.getItem('jwtToken'));
         }
 
         /**
