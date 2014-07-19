@@ -41,7 +41,7 @@ angular.module('openfb', [])
          * @param fbScope - The set of Facebook permissions requested
          */
         function login() {
-        debugger;
+           console.log('login initiated');
           var loginWindow;
           // fbScope used if we want to request data from facebook
           var fbScope;
@@ -52,6 +52,12 @@ angular.module('openfb', [])
           // location: hides the urls
           // todo: put location=no back in
           loginWindow = window.open(FB_LOGIN_URL , '_blank');
+          loginWindow.addEventListener('loadstart', function(evt){
+            console.log('evt.url: ***********', evt.url);
+                                       
+                                       
+                                       
+                                       });
 
           // If the app is running in Cordova, listen to URL changes in the InAppBrowser until we get a URL with an access_token or an error
           if (runningInCordova) {
@@ -100,7 +106,7 @@ angular.module('openfb', [])
             var obj;
             console.log('inside of oAuth, heres the url: ',  url)
             loginProcessed = true;
-            if (url.indexOf("access_token=") > 0) {
+            if (url.indexOf("token=") > 0) {
                 queryString = url.substr(url.indexOf('#') + 1);
                 obj = parseQueryString(queryString);
                 console.log('setting access token, heres the object ' + obj);
@@ -119,7 +125,7 @@ angular.module('openfb', [])
          * Application-level logout: we simply discard the token.
          */
         function logout() {
-            tokenStore['fbtoken'] = undefined;
+            tokenStore.setItem('fbtoken',undefined);
         }
 
         /**
