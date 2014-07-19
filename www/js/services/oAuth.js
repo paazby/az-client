@@ -6,7 +6,7 @@ angular.module('openfb', [])
         // By default we store fbtoken in sessionStorage. This can be overriden
         // in init()
         var tokenStore = window.localStorage;
-        var oauthRedirectURL = 'http://zavadil7.cloudapp.net/linden/passman/dustytoken';
+        var oauthRedirectURL = 'http://zavadil7.cloudapp.net/linden/passman/dustytoken/';
         // Because the OAuth login spans multiple processes, we need to keep the
         // success/error handlers as variables
         // inside the module instead of keeping them local within the login function.
@@ -52,15 +52,25 @@ angular.module('openfb', [])
           // location: hides the urls
           // todo: put location=no back in
           loginWindow = window.open(FB_LOGIN_URL , '_blank');
-          loginWindow.addEventListener('loadstart', function(evt){
-            console.log('evt.url: ***********', evt.url);
+           
                                        
                                        
-                                       
-                                       });
+          
 
           // If the app is running in Cordova, listen to URL changes in the InAppBrowser until we get a URL with an access_token or an error
           if (runningInCordova) {
+           
+            loginWindow.addEventListener('loadstart', function(evt){
+              console.log('evt.url: ***********', evt.url);
+              var url = evt.url;
+              url = url.split('?');
+              console.log('url: ', url);
+              if( url[0] === oauthRedirectURL){
+                console.log('Bingo!!!!!');
+              }
+            });
+
+           
             loginWindow.addEventListener('loadstart', function (event) {
               var url = event.url;
               if (url.indexOf("access_token=") > 0 || url.indexOf("error=") > 0) {
@@ -125,7 +135,8 @@ angular.module('openfb', [])
          * Application-level logout: we simply discard the token.
          */
         function logout() {
-            tokenStore.setItem('fbtoken',undefined);
+          console.log('logout!!!!');
+          tokenStore.setItem('fbtoken',undefined);
         }
 
         /**
